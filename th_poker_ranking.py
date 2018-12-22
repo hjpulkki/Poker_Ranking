@@ -26,7 +26,6 @@ import math
 import matplotlib.pyplot as plt
 
 
-
 def is_pairs(hand):
     numbers = [r for r, s in hand]
     counter = {i: numbers.count(i) for i in numbers if numbers.count(i) > 1}
@@ -63,8 +62,14 @@ def is_high_card(current_hand):
     # number ranking (Most to Least): A, K, Q, J, 10, 9, 8, 7, 6, 5 ,4 ,3, 2
     number_list = [r for r, s in current_hand]
     card_values = dict((r, i) for i, r in enumerate('..23456789TJQKA'))
-    num_scores = sorted(set([card_values[i]*10 for i in number_list]))
-    return True, number_list, max(num_scores)
+
+    score = 0
+    weight = 10
+    for card_value in reversed(sorted([card_values[r] for r, s in current_hand])):
+        score += card_value*weight
+        weight /= 15  # ensures that a_1*weight_1 > a_2*weight_2 for any values of a_i
+    
+    return True, number_list, score
 
 
 def is_high_suit(current_hand):
@@ -169,28 +174,26 @@ def help(hand):
 # hand = "AH KH QH JH TH 9H 8H"
 # print(ranker(hand))
 
-# def main():
-#     hand = ""
-#     card = ""
-#     n = 7
-#
-#     # Ace, Jack, Queen, King
-#     card_num = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
-#     # Hearts, Clubs, Spades, Diamonds
-#     card_suit = ['H', 'C', 'S', 'D']
-#
-#     # generate n number of random card
-#     while len(hand) != 3*(n):
-#         card += random.choice(card_num)
-#         card += random.choice(card_suit)
-#         # leave a space for parsing
-#         card += ' '
-#
-#         # make sure there are no duplicates
-#         if card not in hand:
-#             hand += card
-#         card = ""
-#
-#     return ranker(hand)
-#
-# main()
+def main():
+    hand = ""
+    card = ""
+    n = 7
+    # Ace, Jack, Queen, King
+    card_num = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
+    # Hearts, Clubs, Spades, Diamonds
+    card_suit = ['H', 'C', 'S', 'D']
+    # generate n number of random card
+    while len(hand) != 3*(n):
+        card += random.choice(card_num)
+        card += random.choice(card_suit)
+        # leave a space for parsing
+        card += ' '
+        # make sure there are no duplicates
+        if card not in hand:
+            hand += card
+        card = ""
+    return ranker(hand)
+
+
+if __name__ == '__main__':
+    main()
