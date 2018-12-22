@@ -8,7 +8,6 @@
 #    set ranking:    Royal Flush, Straight Flush, Four of a Kind, Full House, Flush, Straight,
 #                    Three of a Kind, Two Pairs, One Pair, High Card
 #    number ranking: A, K, Q, J, 10, 9, 8, 7, 6, 5 ,4 ,3, 2
-#    suit ranking:   S, H, D, C
 #
 # statistics:
 #    max score: 9144
@@ -30,8 +29,12 @@ max_value = max(card_values.values())
 
 
 def get_card_score(ordered_cards):
+    # Gives a minor score which is used to rank hand with kickers etc. correctly.
+    # Inputs are the number values of card sorted from least important card to the hand
+    # to the most important. Usually largest card is the most important, but pairs for
+    # example are an exception.
+    
     score = 0
-    weight = 1
     for i, card_value in enumerate(ordered_cards):
         weight = (max_value+1)**1  # ensures that a_1*weight_1 < a_2*weight_2 for any values of a_i
         score += card_value*weight
@@ -134,28 +137,3 @@ def ranker(hand):
     score = max(straight_flush, flush, straight, pairs, high_card_suit)
 
     return score
-
-
-def main():
-    hand = ""
-    card = ""
-    n = 5
-    # Ace, Jack, Queen, King
-    card_num = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
-    # Hearts, Clubs, Spades, Diamonds
-    card_suit = ['H', 'C', 'S', 'D']
-    # generate n number of random card
-    while len(hand) != 3*(n):
-        card += random.choice(card_num)
-        card += random.choice(card_suit)
-        # leave a space for parsing
-        card += ' '
-        # make sure there are no duplicates
-        if card not in hand:
-            hand += card
-        card = ""
-    print(hand, ranker(hand))
-
-
-if __name__ == '__main__':
-    main()
