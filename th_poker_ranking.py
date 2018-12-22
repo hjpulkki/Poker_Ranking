@@ -28,51 +28,52 @@ import matplotlib.pyplot as plt
 card_values = dict((r, i) for i, r in enumerate('..23456789TJQKA'))
 max_value = max(card_values.values())
 
-def is_pairs(hand):
-    numbers = [r for r, s in hand]
-    # counter = {i: numbers.count(i) for i in numbers if numbers.count(i) > 1}
-    counter = [0]*(max_value+1)
-    for r, s in hand:
-        counter[card_values[r]] += 1
-        
-    # Sort primary by count and secondary by card size
-    counts_by_importance = sorted(enumerate(counter), key=lambda x:-x[1]-x[0]/max_value)
-    score = get_card_score([i[0] for i in counts_by_importance[:5]])
-
-    # 4 of a kind: 4 cards of the same number
-    if 4 in counter:
-        return score + 7000
-
-    # Full House: 3 of a Kind and 2 of a Kind
-    if 3 in counter and 2 in counter:
-        return score + 6000
-
-    # 3 of a Kind: 3 cards of the same number
-    if 3 in counter:
-        return score + 3000
-
-    # 2 Pairs: 2 Pairs of 2 of a kind (One Pair): 2 cards of the same number
-    if counter.count(2) == 2:
-        return score + 2000
-
-    # 2 of a Kind (One Pair): 2 cards of the same number
-    if 2 in counter:
-        return score + 1000
-
-    return score
-
 
 def get_card_score(ordered_cards):
     score = 0
-    weight = 10
-    for card_value in ordered_cards:
+    weight = 1
+    for i, card_value in enumerate(ordered_cards):
+        weight = (max_value+1)**1  # ensures that a_1*weight_1 < a_2*weight_2 for any values of a_i
         score += card_value*weight
-        weight /= max_value+1  # ensures that a_1*weight_1 > a_2*weight_2 for any values of a_i
+    return score
+
+
+def is_pairs(hand):
+    hand_numbers = [card_values[r] for r, s in hand]
+
+    counter = [0]*(max_value+1)
+    for v in hand_numbers:
+        counter[v] += 1
+        
+    # Sort primary by card count and secondary by card size
+    counts_by_importance = sorted([(v, counter[v]*max_value + v) for v in hand_numbers], key=lambda x: x[1])
+    score = get_card_score([i[0] for i in counts_by_importance[:len(hand)]])
+
+    # 4 of a kind: 4 cards of the same number
+    if 4 in counter:
+        return score + 70000
+
+    # Full House: 3 of a Kind and 2 of a Kind
+    if 3 in counter and 2 in counter:
+        return score + 60000
+
+    # 3 of a Kind: 3 cards of the same number
+    if 3 in counter:
+        return score + 30000
+
+    # 2 Pairs: 2 Pairs of 2 of a kind (One Pair): 2 cards of the same number
+    if counter.count(2) == 2:
+        return score + 20000
+
+    # 2 of a Kind (One Pair): 2 cards of the same number
+    if 2 in counter:
+        return score + 10000
+
     return score
 
 
 def is_high_card(current_hand):
-    ordered_cards = reversed(sorted([card_values[r] for r, s in current_hand]))
+    ordered_cards = sorted([card_values[r] for r, s in current_hand])
     score = get_card_score(ordered_cards)
     return score
 
@@ -85,15 +86,14 @@ def is_flush(hand):
     for i in set(suits):
         if suits.count(i) >= 5:
             score = is_high_card(hand)
-            return score + 5000
+            return score + 50000
         
     return 0
 
 
 def is_straight(hand):
-    numbers = [r for r, s in hand]
-    card_values = dict((r, i) for i, r in enumerate('..23456789TJQKA'))
-    num_list = sorted(set([card_values[i] for i in numbers]))
+    hand_numbers = [card_values[r] for r, s in hand]
+    num_list = sorted(set(hand_numbers))
     straight_hand_cards =[]
 
     # can only be len(num_list) from 7 to 5 - straight has to be 5 cards in a row
@@ -110,29 +110,26 @@ def is_straight(hand):
     straight_hand_cards = sorted(set(straight_hand_cards))
 
     if len(straight_hand_cards) >= 5:
-        score = is_high_card(straight_hand_cards)
-        return score + 4000
+        score = max(hand_numbers)   # Max card determines how good the straight is
+        print(hand, score)
+        return score + 40000
     return 0
 
 
-def is_straight_flush(hand):
-    flush = is_flush(hand)
-    straight = is_straight(hand)
-
+def is_straight_flush(flush, straight):
     if ((flush > 0) and (straight > 0)):
-        score = is_high_card(hand)
-        return score + 8000
+        return straight + 80000
     return 0
 
 
 def ranker(hand):
     hand = hand.split()
     
-    straight_flush = is_straight_flush(hand)    
-    flush = is_flush(hand)
-    straight = is_straight(hand)
-    pairs = is_pairs(hand)
     high_card_suit = is_high_card(hand)
+    pairs = is_pairs(hand)
+    straight = is_straight(hand)
+    flush = is_flush(hand)
+    straight_flush = is_straight_flush(flush, straight)
     
     score = max(straight_flush, flush, straight, pairs, high_card_suit)
 
@@ -157,7 +154,7 @@ def main():
         if card not in hand:
             hand += card
         card = ""
-    return ranker(hand)
+    print(hand, ranker(hand))
 
 
 if __name__ == '__main__':
