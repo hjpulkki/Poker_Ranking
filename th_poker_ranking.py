@@ -33,7 +33,7 @@ def is_pairs(hand):
     score = 0
 
     if len(counter) > 0:
-        score = is_high_card(pairs)[2] + is_high_suit(pairs)[2]
+        score = is_high_card(pairs)[2]
 
     # 4 of a kind: 4 cards of the same number
     if 4 in counter.values():
@@ -72,14 +72,6 @@ def is_high_card(current_hand):
     return True, number_list, score
 
 
-def is_high_suit(current_hand):
-    # suit ranking (Most to Least): S, H, D, C
-    suit_list = [s for r, s in current_hand]
-    suit_values = dict((r, i) for i, r in enumerate('.CDHS'))
-    suit_scores = sorted(set([suit_values[i] for i in suit_list]))
-    return True, suit_list, max(suit_scores)
-
-
 def is_flush(hand):
     # find all suits in hand and count to see if there are 5 or greater
     # find all suit values in hand and return a list of all cards containing that suit (5, 6, or 7 possible cards)
@@ -88,7 +80,7 @@ def is_flush(hand):
     for i in set(suits):
         if suits.count(i) >= 5:
             flush_hand_cards = sorted([j for j in hand if i in j])
-            score = is_high_card(flush_hand_cards)[2] + is_high_suit(flush_hand_cards)[2]
+            score = is_high_card(flush_hand_cards)[2]
             return True, flush_hand_cards, score + 5000
     return False, [], 0
 
@@ -113,7 +105,7 @@ def is_straight(hand):
     straight_hand_cards = sorted(set(straight_hand_cards))
 
     if len(straight_hand_cards) >= 5:
-        score = is_high_card(straight_hand_cards)[2] + is_high_suit(straight_hand_cards)[2]
+        score = is_high_card(straight_hand_cards)[2]
         return True, straight_hand_cards, score + 4000
     return False, [], 0
 
@@ -124,7 +116,7 @@ def is_straight_flush(hand):
     straight_flush_cards = [j for j in flush[1] if j in straight[1]]
 
     if (flush[0] and straight[0]) and (len(straight_flush_cards) >=5):
-        score = is_high_card(straight_flush_cards)[2] + is_high_suit(straight_flush_cards)[2]
+        score = is_high_card(straight_flush_cards)[2]
         return (True, straight_flush_cards, score + 8000), flush, straight
     return (False, [], 0), flush, straight
 
@@ -136,7 +128,7 @@ def is_royal_flush(hand):
     royals_test = all(royals_check.count(i) == 1 for i in royals_list)
 
     if royals_test and len(royals_check) >= 5:
-        score = is_high_card(straight_flush[1])[2] + is_high_suit(straight_flush[1])[2]
+        score = is_high_card(straight_flush[1])[2]
         return (True, straight_flush[1], score + 9000), straight_flush, flush, straight
     return (False, [], 0), straight_flush, flush, straight
 
@@ -146,7 +138,7 @@ def ranker(hand):
 
     royal_flush, straight_flush, flush, straight = is_royal_flush(hand)
     pairs = is_pairs(hand)
-    high_card_suit = is_high_card(hand)[2] + is_high_suit(hand)[2]
+    high_card_suit = is_high_card(hand)[2]
     score = max(royal_flush[2], straight_flush[2], flush[2], straight[2], pairs[2], high_card_suit)
 
     # print("Current hand:  ", hand)
@@ -165,7 +157,7 @@ def help(hand):
 
     royal_flush, straight_flush, flush, straight = is_royal_flush(hand)
     pairs = is_pairs(hand)
-    high_card_suit = is_high_card(hand)[2] + is_high_suit(hand)[2]
+    high_card_suit = is_high_card(hand)[2]
     score = max(royal_flush[2], straight_flush[2], flush[2], straight[2], pairs[2], high_card_suit)
 
     return hand, royal_flush, straight_flush, flush, straight, pairs, high_card_suit, score

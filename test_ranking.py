@@ -11,8 +11,8 @@ def test_two_cards():
     
     
 def test_high_card_kicker():
-    ace_high_kicker_2card = th_poker_ranking.ranker('AC KC')
-    ace_high_2card = th_poker_ranking.ranker('AC 3C')
+    ace_high_kicker_2card = th_poker_ranking.ranker('AC 4C')
+    ace_high_2card = th_poker_ranking.ranker('AS 3C')
     assert ace_high_kicker_2card > ace_high_2card
     
     ace_high_kicker = th_poker_ranking.ranker('AC KC 2S 8H 4D')
