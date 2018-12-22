@@ -20,6 +20,12 @@ def test_high_card_kicker():
     assert ace_high_kicker > ace_high
 
     
+def test_pairs_kicker():
+    pair_kicker = th_poker_ranking.ranker('2S 2H 4D 5C AC')
+    pair = th_poker_ranking.ranker('2S 2H 4D 5C KC')
+    assert pair_kicker > pair
+    
+    
 def test_hand_types():    
     straight_flush = th_poker_ranking.ranker('2C 3C 4C 5C 6C')
     
