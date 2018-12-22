@@ -26,7 +26,21 @@ import matplotlib.pyplot as plt
 
 card_values = dict((r, i) for i, r in enumerate('..23456789TJQKA'))
 max_value = max(card_values.values())
-
+hand_value = {
+    "straight_flush": 12,
+    "4 of kind": 11,
+    "full house": 10,
+    "flush": 9,
+    "straight": 8,
+    "wheel": 7,
+    "3 of kind": 6,
+    "two pair": 5,
+    "canadian flush": 4,
+    "canadian straight": 3,
+    "canadian wheel": 2,
+    "2 of kind": 1,
+    }
+hand_value_multiplier = 10**6
 
 def get_kicker_score(counter, hand_numbers):
     # Gives a minor score which is used to rank hand with kickers etc. correctly.
@@ -47,40 +61,41 @@ def get_kicker_score(counter, hand_numbers):
 def is_pairs(counter):
     # 4 of a kind: 4 cards of the same number
     if 4 in counter:
-        return 7000000
+        return hand_value['4 of kind']
 
     # Full House: 3 of a Kind and 2 of a Kind
     if 3 in counter and 2 in counter:
-        return 6000000
+        return hand_value['full house']
 
     # 3 of a Kind: 3 cards of the same number
     if 3 in counter:
-        return 3000000
+        return hand_value['3 of kind']
 
     # 2 Pairs: 2 Pairs of 2 of a kind (One Pair): 2 cards of the same number
     if counter.count(2) == 2:
-        return 2000000
+        return hand_value['two pair']
 
     # 2 of a Kind (One Pair): 2 cards of the same number
     if 2 in counter:
-        return 1000000
+        return hand_value['2 of kind']
 
     return 0
 
 
-def is_flush(hand, length=5):
+def is_flush(hand, length=5, prefix=''):
     # find all suits in hand and count to see if there are 5 or greater
     # find all suit values in hand and return a list of all cards containing that suit (5, 6, or 7 possible cards)
     suits = [s for r, s in hand]
 
     for i in suits:
         if suits.count(i) >= length:
-            return 5000000
+            return hand_value['{}flush'.format(prefix)]
         
     return 0
 
 
-def is_straight(hand, length=5):
+def is_straight(hand, length=5, prefix=''):
+        
     hand_numbers = [card_values[r] for r, s in hand]
     sorted_hand = sorted(set(hand_numbers))
     
@@ -91,19 +106,19 @@ def is_straight(hand, length=5):
             flag = False
             break
     if flag and 14 in sorted_hand:
-        return 3500000
+        return hand_value['{}wheel'.format(prefix)]
 
     for end_ind in range(len(sorted_hand),length-1,-1):
         print(end_ind)
         if sorted_hand[end_ind-1]-sorted_hand[end_ind-length] == length-1:
-            return 4000000
+            return hand_value['{}straight'.format(prefix)]
         
     return 0
 
 
 def is_straight_flush(flush, straight):
     if ((flush > 0) and (straight > 0)):
-        return 8000000
+        return hand_value['straight_flush']
     return 0
 
 
@@ -125,6 +140,6 @@ def ranker(hand):
         straight, flush = 0, 0
     straight_flush = is_straight_flush(flush, straight)
     
-    score = max(straight_flush, flush, straight, pairs) + kicker_score
+    score = max(straight_flush, flush, straight, pairs)*hand_value_multiplier + kicker_score
 
     return score
