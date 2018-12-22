@@ -117,54 +117,23 @@ def is_straight_flush(hand):
 
     if (flush[0] and straight[0]) and (len(straight_flush_cards) >=5):
         score = is_high_card(straight_flush_cards)[2]
-        return (True, straight_flush_cards, score + 8000), flush, straight
-    return (False, [], 0), flush, straight
-
-
-def is_royal_flush(hand):
-    straight_flush, flush, straight = is_straight_flush(hand)
-    royals_list = ['A', 'K', 'Q', 'J', 'T']
-    royals_check = [i[0] for i in straight_flush[1]]
-    royals_test = all(royals_check.count(i) == 1 for i in royals_list)
-
-    if royals_test and len(royals_check) >= 5:
-        score = is_high_card(straight_flush[1])[2]
-        return (True, straight_flush[1], score + 9000), straight_flush, flush, straight
-    return (False, [], 0), straight_flush, flush, straight
+        return True, straight_flush_cards, score + 8000
+    return False, [], 0
 
 
 def ranker(hand):
     hand = hand.split()
-
-    royal_flush, straight_flush, flush, straight = is_royal_flush(hand)
+    
+    straight_flush = is_straight_flush(hand)    
+    flush = is_flush(hand)
+    straight = is_straight(hand)
     pairs = is_pairs(hand)
-    high_card_suit = is_high_card(hand)[2]
-    score = max(royal_flush[2], straight_flush[2], flush[2], straight[2], pairs[2], high_card_suit)
-
-    # print("Current hand:  ", hand)
-    # print("Royal Flush:   ", royal_flush)
-    # print("Straight Flush:", straight_flush)
-    # print("Flush:         ", flush)
-    # print("Straight:      ", straight)
-    # print("Pairs:         ", pairs)
-    # print("High Card/Suit:", high_card_suit)
-    # print("Score:         ", score)
+    high_card_suit = is_high_card(hand)
+    
+    score = max(straight_flush[2], flush[2], straight[2], pairs[2], high_card_suit[2])
 
     return score
 
-def help(hand):
-    hand = hand.split()
-
-    royal_flush, straight_flush, flush, straight = is_royal_flush(hand)
-    pairs = is_pairs(hand)
-    high_card_suit = is_high_card(hand)[2]
-    score = max(royal_flush[2], straight_flush[2], flush[2], straight[2], pairs[2], high_card_suit)
-
-    return hand, royal_flush, straight_flush, flush, straight, pairs, high_card_suit, score
-
-# enter card numbers into hand
-# hand = "AH KH QH JH TH 9H 8H"
-# print(ranker(hand))
 
 def main():
     hand = ""
