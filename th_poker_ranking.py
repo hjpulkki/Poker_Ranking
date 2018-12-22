@@ -122,7 +122,7 @@ def is_straight_flush(flush, straight):
     return 0
 
 
-def ranker(hand):
+def ranker(hand, canadian=False):
     hand = hand.split()
   
     hand_numbers = [card_values[r] for r, s in hand]
@@ -140,6 +140,11 @@ def ranker(hand):
         straight, flush = 0, 0
     straight_flush = is_straight_flush(flush, straight)
     
-    score = max(straight_flush, flush, straight, pairs)*hand_value_multiplier + kicker_score
+    hand_values = [straight_flush, flush, straight, pairs]
+    if canadian:
+        hand_values.append(is_flush(hand, length=4, prefix='canadian '))
+        hand_values.append(is_straight(hand, length=4, prefix='canadian '))
+    
+    score = max(hand_values)*hand_value_multiplier + kicker_score
 
     return score

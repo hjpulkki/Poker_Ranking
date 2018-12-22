@@ -69,7 +69,51 @@ def test_hand_types():
     assert ace_high > seven_high
     
     
-def test_straght_flushes():
-    straight_flush = th_poker_ranking.ranker('2C 3C 4C 5C 6C')
-    straight_flush_2 = th_poker_ranking.ranker('7C 3C 4C 5C 6C')
-    assert straight_flush_2 > straight_flush
+def test_canadian_types():    
+    straight_flush = th_poker_ranking.ranker('2C 3C 4C 5C 6C', canadian=True)
+    
+    four_of_kind  = th_poker_ranking.ranker('2S 2H 2D 2C AC', canadian=True)
+    assert straight_flush > four_of_kind
+
+    full_house = th_poker_ranking.ranker('2S 2H 2D 3C 3C', canadian=True)
+    assert four_of_kind > full_house
+
+    flush = th_poker_ranking.ranker('2C 3C AC TC 6C', canadian=True)
+    assert full_house > flush
+    
+    straight = th_poker_ranking.ranker('2S 3H 4D 5C 6C', canadian=True)
+    assert flush > straight
+
+    three_of_kind = th_poker_ranking.ranker('2S 2H 2D 5C AC', canadian=True)
+    assert straight > three_of_kind
+
+    two_pair = th_poker_ranking.ranker('2S 2H 4D 4C AC', canadian=True)
+    assert three_of_kind > two_pair
+
+    canadian_flush = th_poker_ranking.ranker('2S 3S 5S 7S AC', canadian=True)
+    assert three_of_kind > canadian_flush
+
+    canadian_flush_and_pair = th_poker_ranking.ranker('2S 3S 5S 7S 7C', canadian=True)
+    assert canadian_flush > canadian_flush_and_pair
+
+    canadian_straight = th_poker_ranking.ranker('3H 4D 5C 6S AC', canadian=True)
+    assert canadian_flush_and_pair > canadian_straight
+
+    canadian_straight_and_pair = th_poker_ranking.ranker('3H 4D 5C 6S 6C', canadian=True)
+    assert canadian_straight > canadian_straight_and_pair
+    
+    pair = th_poker_ranking.ranker('2S 2H 4D 5C AC', canadian=True)
+    assert canadian_straight_and_pair > pair
+
+    ace_high = th_poker_ranking.ranker('2S 3H 5D 7C AC', canadian=True)
+    assert pair > ace_high
+
+    seven_high = th_poker_ranking.ranker('2S 3H 4D 6C 7C', canadian=True)
+    assert ace_high > seven_high
+    
+    
+def test_straight_flushes():
+    straight_flush_7 = th_poker_ranking.ranker('7C 3C 4C 5C 6C')
+    straight_flush_6 = th_poker_ranking.ranker('2C 3C 4C 5C 6C')
+    assert straight_flush_7 > straight_flush_6
+
