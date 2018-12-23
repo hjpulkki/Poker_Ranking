@@ -40,7 +40,7 @@ hand_value = {
     "canadian wheel": 2,
     "2 of kind": 1,
     }
-hand_value_multiplier = 10**6
+hand_value_multiplier = 10**7
 
 def get_kicker_score(counter, hand_numbers):
     # Gives a minor score which is used to rank hand with kickers etc. correctly.
@@ -94,9 +94,7 @@ def is_flush(hand, length=5, prefix=''):
     return 0
 
 
-def is_straight(hand, length=5, prefix=''):
-        
-    hand_numbers = [card_values[r] for r, s in hand]
+def is_straight(hand_numbers, length=5, prefix=''):
     sorted_hand = sorted(set(hand_numbers))
     
     # Wheel: Ace to 5 straight. Highest card is 5
@@ -109,7 +107,6 @@ def is_straight(hand, length=5, prefix=''):
         return hand_value['{}wheel'.format(prefix)]
 
     for end_ind in range(len(sorted_hand),length-1,-1):
-        print(end_ind)
         if sorted_hand[end_ind-1]-sorted_hand[end_ind-length] == length-1:
             return hand_value['{}straight'.format(prefix)]
         
@@ -118,14 +115,18 @@ def is_straight(hand, length=5, prefix=''):
 
 def is_straight_flush(flush, straight):
     if ((flush > 0) and (straight > 0)):
-        return hand_value['straight_flush']
+        return flush+straight  # takes care of the wheel too by giving lower rank to A-5 straight flush.
     return 0
 
 
-def ranker(hand, canadian=False):
-    hand = hand.split()
-  
-    hand_numbers = [card_values[r] for r, s in hand]
+def ranker(string_input, canadian=False):
+    temp_hand = string_input.split()
+    hand = [(card_values[r], s) for r, s in temp_hand]
+    return rank_array(hand, canadian=canadian)
+    
+def rank_array(hand, canadian=False):
+    hand_numbers = [v for v, s in hand]
+    
     counter = [0]*(max_value+1)
     for v in hand_numbers:
         counter[v] += 1
@@ -134,7 +135,7 @@ def ranker(hand, canadian=False):
     
     pairs = is_pairs(counter)
     if pairs == 0:
-        straight = is_straight(hand)
+        straight = is_straight(hand_numbers)
         flush = is_flush(hand)
     else:
         straight, flush = 0, 0
@@ -148,3 +149,4 @@ def ranker(hand, canadian=False):
     score = max(hand_values)*hand_value_multiplier + kicker_score
 
     return score
+

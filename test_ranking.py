@@ -1,4 +1,11 @@
 import th_poker_ranking
+from deuces import *
+
+c = Card()
+e = Evaluator()
+def rank_deuces_hand(hand):
+    # Add two to the numbers since deuces does numbering for 0-12 and not 2-14. Wheel is not correct.
+    return th_poker_ranking.rank_array([(c.get_rank_int(card)+2, c.get_suit_int(card)) for card in hand])
 
 
 def test_two_cards():
@@ -116,4 +123,20 @@ def test_straight_flushes():
     straight_flush_7 = th_poker_ranking.ranker('7C 3C 4C 5C 6C')
     straight_flush_6 = th_poker_ranking.ranker('2C 3C 4C 5C 6C')
     assert straight_flush_7 > straight_flush_6
+    
+    straight_flush_wheel = th_poker_ranking.ranker('2C 3C 4C 5C AC')
+    assert straight_flush_6 > straight_flush_wheel
 
+    
+def test_with_deuces():
+    for i in range(1000):
+        for n_players in range(10):
+            deck = Deck()
+            hands = [deck.draw(5) for i in range(n_players)]
+            scores = [rank_deuces_hand(hand) for hand in hands]
+            scores_deuces = [e.evaluate(hand,[]) for hand in hands]
+
+            A = sorted(enumerate(scores), key=lambda x: x[1])
+            B = sorted(enumerate(scores_deuces), key=lambda x: -x[1])
+
+            assert [a[0] for a in A] == [b[0] for b in B], "Error with hands {}".format(hands)
