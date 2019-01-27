@@ -144,7 +144,7 @@ def rank_array(hand, canadian=False):
     hand_values = [straight_flush, flush, straight, pairs]
     if canadian:
         hand_values.append(is_flush(hand, length=4, prefix='canadian '))
-        hand_values.append(is_straight(hand, length=4, prefix='canadian '))
+        hand_values.append(is_straight(hand_numbers, length=4, prefix='canadian '))
     
     score = max(hand_values)*hand_value_multiplier + kicker_score
 
