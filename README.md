@@ -1,4 +1,4 @@
-# Canadian stud equity game
+# Monte Carlo simulator for Sökö (Canadian stud)
 
 The goal of this repository is to understand poker variant Sökö (sometimes also called Canadian stud). Rules can be found from here https://www.denexa.com/blog/soko-canadian-stud/.
 
